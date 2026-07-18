@@ -2,12 +2,19 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy backend package files
+COPY backend/package*.json ./
 
+# Copy shared folder to parent directory (so ../shared works)
+COPY shared ../shared
+
+# Install dependencies
 RUN npm install
 
-COPY . .
+# Copy backend source code
+COPY backend .
 
 EXPOSE 3000
 
 CMD ["npm", "start"]
+
