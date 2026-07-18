@@ -73,7 +73,6 @@ const configuredOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL |
   .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
   console.log("Configured Origins:", configuredOrigins);
-  console.log("Origin:", origin);
   console.log("Includes?", configuredOrigins.includes(origin));
 // Regex untuk match local network IPs lebih fleksibel
 const isLocalNetworkOrigin = (origin) => {
