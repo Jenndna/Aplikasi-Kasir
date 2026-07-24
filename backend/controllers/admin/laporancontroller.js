@@ -164,7 +164,7 @@ export const refreshBiRingkasanByPeriod = async (start, end) => {
     if (v == null) return 0;
     if (typeof v === 'number') return v;
     if (typeof v === 'string') {
-      const cleaned = v.replace(/[^0-9.\-]/g, '');
+      const cleaned = v.replace(/[^0-9.\\-]/g, '');
       const n = Number(cleaned);
       return Number.isNaN(n) ? 0 : n;
     }
@@ -176,7 +176,7 @@ export const refreshBiRingkasanByPeriod = async (start, end) => {
         const candidate = v[key];
         if (typeof candidate === 'number') return candidate;
         if (typeof candidate === 'string') {
-          const n = Number(candidate.replace(/[^0-9.\-]/g, ''));
+          const n = Number(candidate.replace(/[^0-9.\\-]/g, ''));
           if (!Number.isNaN(n)) return n;
         }
       }
@@ -457,28 +457,32 @@ export const getLaba = async (req, res) => {
 };
 
 export const getDaftarBulanLaporan = async (req, res) => {
-  try {
-    const laporan = await Laporan.find(buildBranchFilter(req.user)).sort({ "periode.start": -1 });
-
-    const daftarBulan = laporan.map((lap) => {
-      const date = new Date(lap.periode.start);
-      const namaBulan = date.toLocaleString("id-ID", { month: "long" });
-      const tahun = date.getFullYear();
-
-      return {
-        id: lap._id,
-        nama_bulan: `${namaBulan} ${tahun}`,
-        bulan: date.getMonth() + 1,
-        tahun,
-        createdAt: lap.createdAt,
-      };
-    });
-
-    res.json({ daftar_bulan: daftarBulan });
-  } catch (err) {
-    console.error("Gagal mengambil daftar bulan:", err);
-    res.status(500).json({ message: "Gagal mengambil daftar bulan laporan" });
-  }
+ try {
+ const laporan = await Laporan.find(buildBranchFilter(req.user)).sort({ "periode.start": -1 });
+ const daftarBulan = laporan.map((lap) => {
+ const date = new Date(lap.periode.start);
+ const namaBulan = date.toLocaleString("id-ID", { month: "long" });
+ const tahun = date.getFullYear();
+ laporan.forEach((lap) => {
+ console.log({
+ raw: lap.periode.start,
+ month: new Date(lap.periode.start).getMonth() + 1,
+ year: new Date(lap.periode.start).getFullYear(),
+ });
+ });
+ return {
+ id: lap._id,
+ nama_bulan: `${namaBulan} ${tahun}`,
+ bulan: date.getMonth() + 1,
+ tahun,
+ createdAt: lap.createdAt,
+ };
+ });
+ res.json({ daftar_bulan: daftarBulan });
+ } catch (err) {
+ console.error("Gagal mengambil daftar bulan:", err);
+ res.status(500).json({ message: "Gagal mengambil daftar bulan laporan" });
+ }
 };
 
 export const getLaporanById = async (req, res) => {
